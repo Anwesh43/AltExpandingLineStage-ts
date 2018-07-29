@@ -82,3 +82,65 @@ class Animator {
         }
     }
 }
+
+class AELNode {
+
+    next : AELNode
+
+    prev : AELNode
+
+    state : State = new State()
+
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new AELNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D) {
+        context.strokeStyle = '#29B6F6'
+        context.lineWidth = Math.min(w, h) / 60
+        context.lineCap = 'round'
+        const gap = w / nodes
+        const index = this.i % 2
+        const newScale = (1 - index) * this.state.scale + index * (1 - this.state.scale)
+        const newGap = (i) =>  (gap / 3) * (1 - 2 * i) * newScale
+        context.save()
+        context.translate(this.i * gap, h/2)
+        for(var i = 0; i < 2; i++) {
+            context.save()
+            context.translate(0, newGap(i))
+            context.beginPath()
+            context.moveTo(0, 0)
+            context.lineTo(gap, 0)
+            context.stroke()
+            context.restore()
+        }
+        context.restore()
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    getNext(dir : number, cb : Function) : AELNode {
+        var curr : AELNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
+    }
+}
