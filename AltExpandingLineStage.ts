@@ -6,6 +6,10 @@ class AltExpandingLineStage {
 
     context : CanvasRenderingContext2D
 
+    animator : Animator = new Animator()
+
+    linkedAEL : LinkedAEL = new LinkedAEL()
+
     constructor() {
         this.initCanvas()
     }
@@ -20,11 +24,19 @@ class AltExpandingLineStage {
     render() {
         this.context.fillStyle = '#BDBDBD'
         this.context.fillRect(0, 0, w, h)
+        this.linkedAEL.draw(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.linkedAEL.startUpdating(() => {
+                this.animator.start(() => {
+                    this.render()
+                    this.linkedAEL.update(() => {
+                        this.animator.stop()
+                    })
+                })
+            })
         }
     }
 
