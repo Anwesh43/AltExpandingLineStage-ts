@@ -30,6 +30,7 @@ class AltExpandingLineStage {
     handleTap() {
         this.canvas.onmousedown = () => {
             this.linkedAEL.startUpdating(() => {
+              console.log("starting animation")
                 this.animator.start(() => {
                     this.render()
                     this.linkedAEL.update(() => {
@@ -65,7 +66,7 @@ class State {
     }
 
     startUpdating(cb : Function) {
-        if (this.dir == 1) {
+        if (this.dir == 0) {
             this.dir = 1 - 2 * this.prevScale
             cb()
         }
@@ -123,7 +124,7 @@ class AELNode {
         const newScale = (1 - index) * this.state.scale + index * (1 - this.state.scale)
         const newGap = (i) =>  (gap / 3) * (1 - 2 * i) * newScale
         context.save()
-        context.translate(this.i * gap, h/2)
+        context.translate(this.i * gap + gap * this.state.scale, h/2)
         for(var i = 0; i < 2; i++) {
             context.save()
             context.translate(0, newGap(i))
@@ -134,6 +135,9 @@ class AELNode {
             context.restore()
         }
         context.restore()
+        if (this.next) {
+            this.next.draw(context)
+        }
     }
 
     update(cb : Function) {
